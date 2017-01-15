@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<meta charset="utf-8" />
+</head>
+<body>
+    <link href="wwwroot/app/css/style.css" rel="stylesheet" />
+    <link href="wwwroot/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+
+    <div class="topbar">
+        <button id="add">Add</button>
+    </div>
+
+    <div class="clear"></div>
+
+
+
+
+    <div class="sidebar"></div>
+
+    <div class="container">
+        <div class="box">
+            <div class="box-tool-bar">
+                <span class="controls">
+                    <i class="fa fa-window-minimize"></i>
+                    <i class="fa fa-window-maximize"></i>
+                    <i class="fa fa-window-close"></i>
+                </span>
+            </div>
+            <div class="clear"></div>
+            <div class="content">
+                <div class="content-body">
+                    The team shipped every 3 weeks, tightly coordinating the schedule with each service team. It works … pretty much as one would expect a web application to work.
+
+                    And then everything went crazy.
+
+                    As we started ramping up the number of services in Azure, it became infeasible for one team to write all of the UI. The teams which owned the service were now responsible (mostly) for writing their own UI, inside of the portal source repository. This had the benefit of allowing individual teams to control their own destiny. However - it now mean that we had hundreds of developers all writing code in the same repository. A change made to the SQL Server management experience could break the Azure Web Sites experience. A change to a CSS file by a developer working on virtual machines could break the experience in storage. Coordinating the 3 week ship schedule became really hard. The team was tracking dependencies across multiple organizations, the underlying REST APIs that powered the experiences, and the release cadence of ~40 teams across the company that were delivering cloud services.
+                    Scaling to ∞ services
+
+                    Given the difficulties of the engineering and ship processes with the current portal, scaling to 200 different services didn’t seem like a great idea with the current infrastructure. The next time around, we took a different approach.
+
+                    The new portal is designed like an operating system. It provides a set of UI widgets, a navigation framework, data management APIs, and other various services one would expect to find with any UI framework. The portal team is responsible for building the operating system (or the shell, as we like to call it), and for the overall health of the portal.
+                    Sandboxing in the browser
+
+                    To claim we’re an OS, we had to build a sandboxing model. One badly behaving application shouldn’t have the ability to bring down the whole OS. In addition to that - an application shouldn’t be able to grab data from another, unless by an approved mechanism. JavaScript by default doesn’t really lend itself well to this kind of isolation - most web developers are used to picking up something like jQuery, and directly working against the DOM. This wasn’t going to work if we wanted to protect the OS against badly behaving (or even malicious) code.
+
+                    To get around this, each new service in Azure builds what we call an ‘extension’. It’s pretty much an application to our operating system. It runs in isolation, inside of an IFRAME. When the portal loads, we inject some bootstrapping scripts into each IFRAME at runtime. Those scripts provide the structured API extensions use to communicate with the shell. This API includes things like:
+
+                    Defining parts, blades, and commands
+                    Customizing the UI of parts
+                    Binding data into UI elements
+                    Sending notifications
+
+                    The most important aspect is that the extension developer doesn’t get to run arbitrary JavaScript in the portal’s window. They can only run script in their IFRAME - which does not project UI. If an extension starts to fault - we can shut it down before it damages the broader system. We spent some time looking into web workers - but found some reliability problems when using > 20 of them at the same time. We’ll probably end up back there at some point.
+                    Distributed continuous deployment
+
+                    In this model, each extension is essentially it’s own web application. Each service hosts their own extension, which is pulled into the shell at runtime. The various UI services of Azure aren’t composed until they are loaded in the browser. This lets us do some really cool stuff. At any given point, a separate experience in the portal (for example, Azure Websites) can choose to deploy an extension that affects only their UI - completely independent of the rest of the portal.
+
+                    IFRAMEs are not used to render the UI - that’s all done in the core frame. The IFRAME is only used to automate the JavaScript APIs that communicate over window.postMessage().
+                    The team shipped every 3 weeks, tightly coordinating the schedule with each service team. It works … pretty much as one would expect a web application to work.
+
+                    And then everything went crazy.
+
+                    As we started ramping up the number of services in Azure, it became infeasible for one team to write all of the UI. The teams which owned the service were now responsible (mostly) for writing their own UI, inside of the portal source repository. This had the benefit of allowing individual teams to control their own destiny. However - it now mean that we had hundreds of developers all writing code in the same repository. A change made to the SQL Server management experience could break the Azure Web Sites experience. A change to a CSS file by a developer working on virtual machines could break the experience in storage. Coordinating the 3 week ship schedule became really hard. The team was tracking dependencies across multiple organizations, the underlying REST APIs that powered the experiences, and the release cadence of ~40 teams across the company that were delivering cloud services.
+                    Scaling to ∞ services
+
+                    Given the difficulties of the engineering and ship processes with the current portal, scaling to 200 different services didn’t seem like a great idea with the current infrastructure. The next time around, we took a different approach.
+
+                    The new portal is designed like an operating system. It provides a set of UI widgets, a navigation framework, data management APIs, and other various services one would expect to find with any UI framework. The portal team is responsible for building the operating system (or the shell, as we like to call it), and for the overall health of the portal.
+                    Sandboxing in the browser
+
+                    To claim we’re an OS, we had to build a sandboxing model. One badly behaving application shouldn’t have the ability to bring down the whole OS. In addition to that - an application shouldn’t be able to grab data from another, unless by an approved mechanism. JavaScript by default doesn’t really lend itself well to this kind of isolation - most web developers are used to picking up something like jQuery, and directly working against the DOM. This wasn’t going to work if we wanted to protect the OS against badly behaving (or even malicious) code.
+
+                    To get around this, each new service in Azure builds what we call an ‘extension’. It’s pretty much an application to our operating system. It runs in isolation, inside of an IFRAME. When the portal loads, we inject some bootstrapping scripts into each IFRAME at runtime. Those scripts provide the structured API extensions use to communicate with the shell. This API includes things like:
+
+                    Defining parts, blades, and commands
+                    Customizing the UI of parts
+                    Binding data into UI elements
+                    Sending notifications
+
+                    The most important aspect is that the extension developer doesn’t get to run arbitrary JavaScript in the portal’s window. They can only run script in their IFRAME - which does not project UI. If an extension starts to fault - we can shut it down before it damages the broader system. We spent some time looking into web workers - but found some reliability problems when using > 20 of them at the same time. We’ll probably end up back there at some point.
+                    Distributed continuous deployment
+
+                    In this model, each extension is essentially it’s own web application. Each service hosts their own extension, which is pulled into the shell at runtime. The various UI services of Azure aren’t composed until they are loaded in the browser. This lets us do some really cool stuff. At any given point, a separate experience in the portal (for example, Azure Websites) can choose to deploy an extension that affects only their UI - completely independent of the rest of the portal.
+
+                    IFRAMEs are not used to render the UI - that’s all done in the core frame. The IFRAME is only used to automate the JavaScript APIs that communicate over window.postMessage().
+                    The team shipped every 3 weeks, tightly coordinating the schedule with each service team. It works … pretty much as one would expect a web application to work.
+
+                    And then everything went crazy.
+
+                    As we started ramping up the number of services in Azure, it became infeasible for one team to write all of the UI. The teams which owned the service were now responsible (mostly) for writing their own UI, inside of the portal source repository. This had the benefit of allowing individual teams to control their own destiny. However - it now mean that we had hundreds of developers all writing code in the same repository. A change made to the SQL Server management experience could break the Azure Web Sites experience. A change to a CSS file by a developer working on virtual machines could break the experience in storage. Coordinating the 3 week ship schedule became really hard. The team was tracking dependencies across multiple organizations, the underlying REST APIs that powered the experiences, and the release cadence of ~40 teams across the company that were delivering cloud services.
+                    Scaling to ∞ services
+
+                    Given the difficulties of the engineering and ship processes with the current portal, scaling to 200 different services didn’t seem like a great idea with the current infrastructure. The next time around, we took a different approach.
+
+                    The new portal is designed like an operating system. It provides a set of UI widgets, a navigation framework, data management APIs, and other various services one would expect to find with any UI framework. The portal team is responsible for building the operating system (or the shell, as we like to call it), and for the overall health of the portal.
+                    Sandboxing in the browser
+
+                    To claim we’re an OS, we had to build a sandboxing model. One badly behaving application shouldn’t have the ability to bring down the whole OS. In addition to that - an application shouldn’t be able to grab data from another, unless by an approved mechanism. JavaScript by default doesn’t really lend itself well to this kind of isolation - most web developers are used to picking up something like jQuery, and directly working against the DOM. This wasn’t going to work if we wanted to protect the OS against badly behaving (or even malicious) code.
+
+                    To get around this, each new service in Azure builds what we call an ‘extension’. It’s pretty much an application to our operating system. It runs in isolation, inside of an IFRAME. When the portal loads, we inject some bootstrapping scripts into each IFRAME at runtime. Those scripts provide the structured API extensions use to communicate with the shell. This API includes things like:
+
+                    Defining parts, blades, and commands
+                    Customizing the UI of parts
+                    Binding data into UI elements
+                    Sending notifications
+
+                    The most important aspect is that the extension developer doesn’t get to run arbitrary JavaScript in the portal’s window. They can only run script in their IFRAME - which does not project UI. If an extension starts to fault - we can shut it down before it damages the broader system. We spent some time looking into web workers - but found some reliability problems when using > 20 of them at the same time. We’ll probably end up back there at some point.
+                    Distributed continuous deployment
+
+                    In this model, each extension is essentially it’s own web application. Each service hosts their own extension, which is pulled into the shell at runtime. The various UI services of Azure aren’t composed until they are loaded in the browser. This lets us do some really cool stuff. At any given point, a separate experience in the portal (for example, Azure Websites) can choose to deploy an extension that affects only their UI - completely independent of the rest of the portal.
+
+                    IFRAMEs are not used to render the UI - that’s all done in the core frame. The IFRAME is only used to automate the JavaScript APIs that communicate over window.postMessage().
+                    The team shipped every 3 weeks, tightly coordinating the schedule with each service team. It works … pretty much as one would expect a web application to work.
+
+                    And then everything went crazy.
+
+                    As we started ramping up the number of services in Azure, it became infeasible for one team to write all of the UI. The teams which owned the service were now responsible (mostly) for writing their own UI, inside of the portal source repository. This had the benefit of allowing individual teams to control their own destiny. However - it now mean that we had hundreds of developers all writing code in the same repository. A change made to the SQL Server management experience could break the Azure Web Sites experience. A change to a CSS file by a developer working on virtual machines could break the experience in storage. Coordinating the 3 week ship schedule became really hard. The team was tracking dependencies across multiple organizations, the underlying REST APIs that powered the experiences, and the release cadence of ~40 teams across the company that were delivering cloud services.
+                    Scaling to ∞ services
+
+                    Given the difficulties of the engineering and ship processes with the current portal, scaling to 200 different services didn’t seem like a great idea with the current infrastructure. The next time around, we took a different approach.
+
+                    The new portal is designed like an operating system. It provides a set of UI widgets, a navigation framework, data management APIs, and other various services one would expect to find with any UI framework. The portal team is responsible for building the operating system (or the shell, as we like to call it), and for the overall health of the portal.
+                    Sandboxing in the browser
+
+                    To claim we’re an OS, we had to build a sandboxing model. One badly behaving application shouldn’t have the ability to bring down the whole OS. In addition to that - an application shouldn’t be able to grab data from another, unless by an approved mechanism. JavaScript by default doesn’t really lend itself well to this kind of isolation - most web developers are used to picking up something like jQuery, and directly working against the DOM. This wasn’t going to work if we wanted to protect the OS against badly behaving (or even malicious) code.
+
+                    To get around this, each new service in Azure builds what we call an ‘extension’. It’s pretty much an application to our operating system. It runs in isolation, inside of an IFRAME. When the portal loads, we inject some bootstrapping scripts into each IFRAME at runtime. Those scripts provide the structured API extensions use to communicate with the shell. This API includes things like:
+
+                    Defining parts, blades, and commands
+                    Customizing the UI of parts
+                    Binding data into UI elements
+                    Sending notifications
+
+                    The most important aspect is that the extension developer doesn’t get to run arbitrary JavaScript in the portal’s window. They can only run script in their IFRAME - which does not project UI. If an extension starts to fault - we can shut it down before it damages the broader system. We spent some time looking into web workers - but found some reliability problems when using > 20 of them at the same time. We’ll probably end up back there at some point.
+                    Distributed continuous deployment
+
+                    In this model, each extension is essentially it’s own web application. Each service hosts their own extension, which is pulled into the shell at runtime. The various UI services of Azure aren’t composed until they are loaded in the browser. This lets us do some really cool stuff. At any given point, a separate experience in the portal (for example, Azure Websites) can choose to deploy an extension that affects only their UI - completely independent of the rest of the portal.
+
+                    IFRAMEs are not used to render the UI - that’s all done in the core frame. The IFRAME is only used to automate the JavaScript APIs that communicate over window.postMessage().
+                    The team shipped every 3 weeks, tightly coordinating the schedule with each service team. It works … pretty much as one would expect a web application to work.
+
+                    And then everything went crazy.
+
+                    As we started ramping up the number of services in Azure, it became infeasible for one team to write all of the UI. The teams which owned the service were now responsible (mostly) for writing their own UI, inside of the portal source repository. This had the benefit of allowing individual teams to control their own destiny. However - it now mean that we had hundreds of developers all writing code in the same repository. A change made to the SQL Server management experience could break the Azure Web Sites experience. A change to a CSS file by a developer working on virtual machines could break the experience in storage. Coordinating the 3 week ship schedule became really hard. The team was tracking dependencies across multiple organizations, the underlying REST APIs that powered the experiences, and the release cadence of ~40 teams across the company that were delivering cloud services.
+                    Scaling to ∞ services
+
+                    Given the difficulties of the engineering and ship processes with the current portal, scaling to 200 different services didn’t seem like a great idea with the current infrastructure. The next time around, we took a different approach.
+
+                    The new portal is designed like an operating system. It provides a set of UI widgets, a navigation framework, data management APIs, and other various services one would expect to find with any UI framework. The portal team is responsible for building the operating system (or the shell, as we like to call it), and for the overall health of the portal.
+                    Sandboxing in the browser
+
+                    To claim we’re an OS, we had to build a sandboxing model. One badly behaving application shouldn’t have the ability to bring down the whole OS. In addition to that - an application shouldn’t be able to grab data from another, unless by an approved mechanism. JavaScript by default doesn’t really lend itself well to this kind of isolation - most web developers are used to picking up something like jQuery, and directly working against the DOM. This wasn’t going to work if we wanted to protect the OS against badly behaving (or even malicious) code.
+
+                    To get around this, each new service in Azure builds what we call an ‘extension’. It’s pretty much an application to our operating system. It runs in isolation, inside of an IFRAME. When the portal loads, we inject some bootstrapping scripts into each IFRAME at runtime. Those scripts provide the structured API extensions use to communicate with the shell. This API includes things like:
+
+                    Defining parts, blades, and commands
+                    Customizing the UI of parts
+                    Binding data into UI elements
+                    Sending notifications
+
+                    The most important aspect is that the extension developer doesn’t get to run arbitrary JavaScript in the portal’s window. They can only run script in their IFRAME - which does not project UI. If an extension starts to fault - we can shut it down before it damages the broader system. We spent some time looking into web workers - but found some reliability problems when using > 20 of them at the same time. We’ll probably end up back there at some point.
+                    Distributed continuous deployment
+
+                    In this model, each extension is essentially it’s own web application. Each service hosts their own extension, which is pulled into the shell at runtime. The various UI services of Azure aren’t composed until they are loaded in the browser. This lets us do some really cool stuff. At any given point, a separate experience in the portal (for example, Azure Websites) can choose to deploy an extension that affects only their UI - completely independent of the rest of the portal.
+
+                    IFRAMEs are not used to render the UI - that’s all done in the core frame. The IFRAME is only used to automate the JavaScript APIs that communicate over window.postMessage().
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <script src="wwwroot/lib/jquery/dist/jquery.min.js"></script>
+    <script src="wwwroot/app/script/JavaScript.js"></script>
+</body>
+</html>

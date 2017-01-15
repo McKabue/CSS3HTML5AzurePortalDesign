@@ -1,0 +1,79 @@
+﻿html, body { 
+    height: 100%;
+     width: 100%; 
+     margin: 0;
+}
+
+.clear{
+    clear:both;
+}
+
+.topbar{
+    height: 40px;
+    width:100%;
+    background:#000;
+}
+
+
+
+
+.sidebar {
+    width: 7%;
+    height: calc(100% - 40px);
+    background: blue;
+    float:left;
+}
+
+.container{
+    height: calc(100% - 40px);
+    overflow-y:hidden;
+    white-space:nowrap;
+    overflow-x:auto;
+}
+
+.box{
+    width:400px;
+    height: 100%;
+    background-color: red;
+    margin-right:10px;
+    display:inline-block;
+}
+
+.box .box-tool-bar{
+    height:40px;
+    background: #ffffff;
+    position: relative;
+}
+
+
+
+.box .box-tool-bar .controls{
+    right: 0px; 
+    position: absolute;
+}
+
+.box .box-tool-bar .controls i{
+    font-size:16px;
+    cursor:pointer;
+}
+
+.box .content{
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    white-space:normal;
+}
+
+.box .content .content-body{
+    margin-bottom: 40px;
+}
+
+.box:last-child{
+    margin-right:30%;
+}
+.box:first-child{
+    margin-left:10px;
+}
+
+
+
