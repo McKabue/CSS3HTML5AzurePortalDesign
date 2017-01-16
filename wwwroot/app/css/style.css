@@ -2,6 +2,7 @@
     height: 100%;
      width: 100%; 
      margin: 0;
+     overflow:hidden;
 }
 
 .clear{
@@ -16,19 +17,47 @@
 
 
 
-
-.sidebar {
-    width: 7%;
-    height: calc(100% - 40px);
-    background: blue;
-    float:left;
-}
-
 .container{
     height: calc(100% - 40px);
+    position:relative;
+    
+}
+
+
+.sidebar {
+    background: blue;
+    display:inline-block;
+    position:relative;
+    width:16.5%;
+    height:100%;
+    overflow:hidden;
+}
+.sidebar .sidebar-head {
+    background: #ff6a00;
+    height: 80px;
+}
+.sidebar .sidebar-content {
+    background: blue;
+    overflow-y:auto;
+    overflow-x:hidden;
+    height: calc(100% - 80px);
+}
+
+
+.content-section{
+    display:inline-block;
+    position:relative;
+    width:83%;
+    height:100%;
+    overflow-x:auto;
     overflow-y:hidden;
     white-space:nowrap;
+    /*overflow-y:hidden;
+    white-space:nowrap;
     overflow-x:auto;
+    position:relative;
+    display:inline-block;
+    width: 7%;*/
 }
 
 .box{
@@ -58,15 +87,13 @@
 }
 
 .box .content{
-    height: 100%;
+    height: calc(100% - 40px);
     overflow-y: auto;
     overflow-x: hidden;
     white-space:normal;
 }
 
-.box .content .content-body{
-    margin-bottom: 40px;
-}
+
 
 .box:last-child{
     margin-right:30%;
